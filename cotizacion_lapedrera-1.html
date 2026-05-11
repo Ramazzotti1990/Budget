@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Presupuesto · La Pedrera</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #F0EBE2; color: #1C1409; max-width: 430px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* HEADER */
+#hdr { background: #1C1409; color: #F0EBE2; padding: 12px 16px; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+.hdr-eye { font-size: 9px; letter-spacing: 3px; opacity: 0.4; text-transform: uppercase; margin-bottom: 3px; }
+.hdr-row { display: flex; justify-content: space-between; align-items: center; }
+.hdr-title { font-size: 15px; font-weight: 600; }
+#btn-mon { background: rgba(200,169,110,0.2); border: 1px solid rgba(200,169,110,0.45); color: #C8A96E; border-radius: 6px; padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; }
+#total-bar { margin-top: 10px; background: rgba(200,169,110,0.12); border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(200,169,110,0.22); }
+#total-bar .t-lbl { font-size: 9px; opacity: 0.45; letter-spacing: 2px; text-transform: uppercase; }
+#total-val { font-size: 20px; font-weight: 700; color: #C8A96E; }
+
+/* TABS */
+#tabs { display: flex; background: #E4DDD4; border-bottom: 2px solid #CFC8BA; flex-shrink: 0; }
+.tb { flex: 1; padding: 10px 0; border: none; background: transparent; color: #8A7A6A; font-size: 11px; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.tb.on { background: #F0EBE2; color: #1C1409; font-weight: 700; border-bottom-color: #6B5A3E; }
+
+/* CONTENT */
+#content { flex: 1; overflow-y: auto; padding: 10px 12px 80px; }
+
+/* UTILS */
+.hint { font-size: 11px; color: #9A8A78; text-align: center; margin-bottom: 12px; }
+.card { background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+.card-ttl { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #9A8A78; text-transform: uppercase; margin-bottom: 12px; }
+.divider { height: 1px; background: #EDE6DC; margin: 10px 0; }
+.rrow { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #F0EBE2; gap: 8px; }
+.rrow:last-child { border-bottom: none; }
+.rl { font-size: 12px; color: #1C1409; font-weight: 500; }
+.rs { font-size: 10px; color: #9A8A78; margin-top: 2px; }
+.rv { font-size: 13px; font-weight: 700; color: #6B5A3E; text-align: right; white-space: nowrap; }
+.bar-row { margin-bottom: 10px; }
+.bar-top { display: flex; justify-content: space-between; margin-bottom: 3px; }
+.bar-nm { font-size: 12px; color: #1C1409; }
+.bar-vl { font-size: 12px; font-weight: 700; }
+.bar-tr { background: #EDE6DC; border-radius: 4px; height: 6px; overflow: hidden; }
+.bar-fl { height: 100%; border-radius: 4px; transition: width 0.4s; }
+.bar-pt { font-size: 10px; color: #9A8A78; margin-top: 2px; }
+.info-box { background: #FFF8EE; border: 1px solid #E8D8B0; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; font-size: 11px; color: #6B5A3E; line-height: 1.7; }
+
+/* RUBROS */
+.cat-hdr { display: flex; justify-content: space-between; align-items: center; padding-left: 8px; margin-bottom: 6px; margin-top: 4px; }
+.cat-nm { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+.cat-sb { font-size: 12px; font-weight: 700; }
+.cat-grp { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+.rc { background: #fff; border-radius: 10px; overflow: hidden; border: 2px solid transparent; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.rc.open { box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+.rc-row { padding: 11px 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.rc-l { flex: 1; min-width: 0; }
+.rc-nm { font-weight: 600; font-size: 13px; line-height: 1.3; }
+.rc-badge { display: inline-block; font-size: 10px; font-weight: 700; border-radius: 4px; padding: 2px 7px; margin-top: 4px; }
+.rc-desc { font-size: 11px; color: #9A8A78; margin-top: 2px; }
+.rc-r { text-align: right; flex-shrink: 0; }
+.rc-tot { font-size: 15px; font-weight: 700; }
+.rc-cant { font-size: 10px; color: #9A8A78; }
+.rc-arr { font-size: 12px; color: #C8B8A0; margin-top: 3px; }
+.exp { padding: 12px; }
+.exp-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+.cant-row { background: #fff; border-radius: 8px; padding: 9px 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+.cant-ctrl { display: flex; align-items: center; border-radius: 7px; overflow: hidden; }
+.cant-btn { background: none; border: none; padding: 6px 12px; font-size: 18px; cursor: pointer; font-weight: 700; line-height: 1; }
+.cant-inp { width: 46px; text-align: center; border: none; padding: 6px 2px; font-size: 14px; font-weight: 600; color: #1C1409; outline: none; background: transparent; }
+.cant-unit { font-size: 12px; color: #9A8A78; }
+.cant-tot { margin-left: auto; font-size: 13px; font-weight: 700; }
+.op { padding: 10px 12px; border-radius: 8px; cursor: pointer; border: 2px solid #E0D8CE; display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 5px; background: #fff; transition: all 0.15s; }
+.op-l { flex: 1; min-width: 0; }
+.op-nm { font-size: 12px; font-weight: 500; }
+.op-dc { font-size: 10px; opacity: 0.65; margin-top: 1px; }
+.op-r { text-align: right; flex-shrink: 0; }
+.op-p { font-size: 13px; font-weight: 700; }
+.op-u { font-size: 10px; opacity: 0.6; }
+
+/* MO */
+.mo-f { margin-bottom: 14px; }
+.mo-lbl { font-size: 12px; font-weight: 600; color: #1C1409; margin-bottom: 2px; display: block; }
+.mo-sub { font-size: 10px; color: #9A8A78; margin-bottom: 5px; display: block; }
+.mo-ctrl { display: flex; align-items: center; gap: 8px; }
+.mo-inp { flex: 1; border: 1.5px solid #C8A96E; border-radius: 7px; padding: 8px 10px; font-size: 14px; font-weight: 600; color: #1C1409; outline: none; text-align: right; background: #FFFDF8; }
+.mo-unit { font-size: 11px; color: #9A8A78; white-space: nowrap; }
+.mo-slider { width: 100%; accent-color: #6B5A3E; margin-top: 6px; height: 20px; }
+.sl-labs { display: flex; justify-content: space-between; font-size: 10px; color: #9A8A78; margin-top: 2px; }
+.mini-res { margin-top: 5px; font-size: 11px; border-radius: 6px; padding: 6px 10px; }
+.mo-box { border-radius: 10px; padding: 14px; margin-top: 8px; color: #F0EBE2; }
+
+/* RESUMEN FINAL */
+.hero { background: linear-gradient(135deg,#1C1409,#3A2010); border-radius: 14px; padding: 18px; margin-bottom: 10px; color: #F0EBE2; }
+.hero-lbl { font-size: 9px; letter-spacing: 3px; opacity: 0.4; text-transform: uppercase; margin-bottom: 4px; }
+.hero-val { font-size: 34px; font-weight: 700; color: #C8A96E; line-height: 1; }
+.hero-sub { font-size: 11px; opacity: 0.35; margin-top: 4px; }
+.hero-nota { margin-top: 10px; font-size: 10px; opacity: 0.28; line-height: 1.7; }
+.res-block { border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
+.res-line { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.res-line:last-child { border-bottom: none; }
+.res-lbl { font-size: 12px; }
+.res-sub2 { font-size: 10px; opacity: 0.55; margin-top: 1px; }
+.res-val { font-size: 13px; font-weight: 700; text-align: right; white-space: nowrap; }
+.m2-box { border-radius: 10px; padding: 14px; margin-bottom: 8px; }
+.m2-main { font-size: 30px; font-weight: 700; line-height: 1; }
+.m2-unit { font-size: 13px; font-weight: 400; opacity: 0.6; }
+.tf { display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #1C1409; margin-top: 10px; padding-top: 10px; }
+.tf-lbl { font-size: 13px; font-weight: 700; }
+.tf-val { font-size: 17px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div class="hdr-eye">Estudio Sarachaga · La Pedrera · 2026</div>
+  <div class="hdr-row">
+    <div class="hdr-title">Presupuesto Obra</div>
+    <button id="btn-mon" onclick="toggleMon()">U$S</button>
+  </div>
+  <div id="total-bar">
+    <span class="t-lbl">Total al cliente</span>
+    <span id="total-val">U$S 0</span>
+  </div>
+</div>
+
+<div id="tabs">
+  <button class="tb on"  onclick="setTab('mat',this)">📋 Materiales</button>
+  <button class="tb"     onclick="setTab('mo',this)">👷 MO + BPS</button>
+  <button class="tb"     onclick="setTab('res',this)">📊 Resumen</button>
+</div>
+
+<div id="content"></div>
+
+<script>
+const TC = 41.5;
+let uyu = false, openId = null, tab = 'mat';
+
+// ─── MO state ───────────────────────────────────────────
+const MO = {
+  jornal:       2953,   // Laudo Cat V abril 2025 (UYU)
+  viatico:      1477,   // Viático La Pedrera = 50% jornal (Décima Ronda 2023)
+  jCasa:        4.0,    // j/m² construcción (rango BPS: 3.5–5)
+  jDeck:        1.0,    // j/m² colocación deck madera (rango: 0.8–1.5)
+  m2Casa:       107,
+  m2Deck:       131,
+  auc:          75.8,   // 71.8% BPS + 4% Caja Prof. Arquitectura
+  empresa:      30,     // % margen empresa sobre subtotal+imprevistos
+};
+
+// ─── Colores por categoría ───────────────────────────────
+const COL = {
+  "Estructura":"#6B5A3E","Cubierta":"#3D6480","Fachada Exterior":"#4A6B4A",
+  "Revestimiento Interior":"#7A5A3A","Pisos":"#6B5A3A","Deck Exterior":"#5A3D20",
+  "Aberturas":"#3A5A6B","Instalaciones":"#6B3A3A","Parrillero / Lavadero":"#4A5A3A"
+};
+
+// ─── Rubros ──────────────────────────────────────────────
+const RUBROS = [
+  {id:"mamp_ext",cat:"Estructura",nom:"Mampostería exterior",un:"ml",cant:54,sel:"a",ops:[
+    {id:"a",lbl:"Bloque hormigón 20cm",dc:"Bloque 20×20×40 c/ MO",p:85},
+    {id:"b",lbl:"Steel Frame",dc:"Steel frame galv. c/ aislación",p:110},
+    {id:"c",lbl:"Bloque cerámico 20cm",dc:"Cerámico hueco c/ MO",p:72}]},
+  {id:"mamp_int",cat:"Estructura",nom:"Mampostería interior",un:"ml",cant:35,sel:"a",ops:[
+    {id:"a",lbl:"Bloque hormigón 15cm",dc:"Bloque 15×20×40 c/ MO",p:65},
+    {id:"b",lbl:"Steel Frame interior",dc:"Tabique steel frame + placa yeso",p:80},
+    {id:"c",lbl:"Bloque cerámico 12cm",dc:"Cerámico hueco c/ MO",p:58}]},
+  {id:"cubierta",cat:"Cubierta",nom:"Cubierta 4 aguas",un:"m²",cant:120,sel:"a",ops:[
+    {id:"a",lbl:"Chapa galvanizada N°27",dc:"Ondulada + estructura metálica",p:55},
+    {id:"b",lbl:"Chapa prepintada color",dc:"Trapezoidal prepintada + estructura",p:68},
+    {id:"c",lbl:"Zinc standing seam",dc:"Zinc natural alta gama",p:95}]},
+  {id:"pergola",cat:"Cubierta",nom:"Pérgolas Norte + Sur",un:"m²",cant:32,sel:"a",ops:[
+    {id:"a",lbl:"Policarbonato 6mm",dc:"Ondulado + alfajías pino",p:45},
+    {id:"b",lbl:"Policarbonato 10mm",dc:"Alveolar + estructura aluminio",p:62},
+    {id:"c",lbl:"Madera + tejuela",dc:"Estructura madera + tejuela asfáltica",p:55}]},
+  {id:"fachada",cat:"Fachada Exterior",nom:"Revestimiento fachada",un:"m²",cant:134,sel:"a",ops:[
+    {id:"a",lbl:"Cladding pino autoclave",dc:"Machihembrado + lasur protector",p:83},
+    {id:"b",lbl:"Chapa metálica prepintada",dc:"Panel trapezoidal acero prepintado",p:71},
+    {id:"c",lbl:"Revoque + pintura",dc:"Revoque exterior + elastomérico",p:38},
+    {id:"d",lbl:"Cladding Ipê / Cumaru",dc:"Madera dura tropical + aceite",p:115}]},
+  {id:"rev_int",cat:"Revestimiento Interior",nom:"Revoque + pintura interior",un:"m²",cant:175,sel:"a",ops:[
+    {id:"a",lbl:"Yeso proyectado + látex",dc:"Yeso + 2 manos látex lavable",p:25},
+    {id:"b",lbl:"Revoque cal + pintura",dc:"Cal-portland + látex",p:22},
+    {id:"c",lbl:"Microcemento",dc:"2mm con sellador",p:55}]},
+  {id:"rev_bano",cat:"Revestimiento Interior",nom:"Revestimiento baños",un:"m²",cant:45,sel:"a",ops:[
+    {id:"a",lbl:"Porcelanato 30×60",dc:"Rectificado piso a techo",p:35},
+    {id:"b",lbl:"Porcelanato 60×60",dc:"Gran formato fragüe fino",p:48},
+    {id:"c",lbl:"Cerámico estándar",dc:"20×40 cm esmaltado",p:22}]},
+  {id:"piso_hum",cat:"Pisos",nom:"Pisos baños + cocina",un:"m²",cant:25,sel:"a",ops:[
+    {id:"a",lbl:"Porcelanato 60×60",dc:"Antideslizante c/ adhesivo",p:32},
+    {id:"b",lbl:"Cerámico antideslizante",dc:"40×40 cm",p:20},
+    {id:"c",lbl:"Microcemento piso",dc:"Pigmentado con sellador epoxi",p:58}]},
+  {id:"piso_seco",cat:"Pisos",nom:"Pisos living + dormitorios",un:"m²",cant:82,sel:"a",ops:[
+    {id:"a",lbl:"Madera ingeniería 12mm",dc:"Flotante c/ zócalo",p:45},
+    {id:"b",lbl:"Vinílico SPC 5mm",dc:"100% impermeable rígido",p:28},
+    {id:"c",lbl:"Madera maciza 18mm",dc:"Eucaliptus o Roble",p:72},
+    {id:"d",lbl:"Porcelanato 90×90",dc:"Gran formato rectificado",p:52}]},
+  {id:"deck",cat:"Deck Exterior",nom:"Deck perimetral",un:"m²",cant:131,sel:"a",ops:[
+    {id:"a",lbl:"Cumaru / Teca 19mm",dc:"Madera dura, tornillería inox",p:95},
+    {id:"b",lbl:"Pino autoclave H4",dc:"Tratado H4, tornillería galv.",p:58},
+    {id:"c",lbl:"Deck composite WPC",dc:"Sin mantenimiento, anti-UV",p:78},
+    {id:"d",lbl:"Ipê natural",dc:"Máxima durabilidad costera",p:110}]},
+  {id:"ventanas",cat:"Aberturas",nom:"Ventanas (est. 10 un.)",un:"un",cant:10,sel:"a",ops:[
+    {id:"a",lbl:"Aluminio DVH",dc:"Corredizas + doble vidriado",p:380},
+    {id:"b",lbl:"Aluminio vidrio simple",dc:"Corredizas + vidrio simple",p:220},
+    {id:"c",lbl:"Carpintería madera",dc:"Madera dura c/ herrajes inox",p:480}]},
+  {id:"puertas_int",cat:"Aberturas",nom:"Puertas interiores (7 un.)",un:"un",cant:7,sel:"a",ops:[
+    {id:"a",lbl:"Placa HDF",dc:"0.80×2.05m c/ marco y herrajes",p:180},
+    {id:"b",lbl:"Madera maciza",dc:"Pino/cedro c/ marco y herrajes",p:290},
+    {id:"c",lbl:"Corredera embutida",dc:"Flush c/ riel embutido",p:350}]},
+  {id:"puerta_ext",cat:"Aberturas",nom:"Puerta exterior principal",un:"un",cant:1,sel:"a",ops:[
+    {id:"a",lbl:"Madera pivotante",dc:"Madera dura + vidrio lateral",p:650},
+    {id:"b",lbl:"Chapa + vidrio",dc:"Metálica prepintada + vidrio",p:480},
+    {id:"c",lbl:"Aluminio + DVH",dc:"Aluminio c/ doble vidriado",p:750}]},
+  {id:"sanitaria",cat:"Instalaciones",nom:"Instalación sanitaria",un:"gl",cant:1,sel:"a",ops:[
+    {id:"a",lbl:"PVC estándar",dc:"Cañería PVC + accesorios + MO",p:3500},
+    {id:"b",lbl:"PPR alta calidad",dc:"PPR termofusión + accesorios",p:4800}]},
+  {id:"electrica",cat:"Instalaciones",nom:"Instalación eléctrica",un:"gl",cant:1,sel:"a",ops:[
+    {id:"a",lbl:"Monofásica estándar",dc:"Tablero + cañería + bocas",p:3200},
+    {id:"b",lbl:"Bifásica + domótica",dc:"Bifásica + módulos domótica",p:5500}]},
+  {id:"sanitarios",cat:"Instalaciones",nom:"Sanitarios y griferías (3 baños)",un:"jgo",cant:3,sel:"a",ops:[
+    {id:"a",lbl:"Línea básica",dc:"WC, lavatorio, ducha, grifería",p:850},
+    {id:"b",lbl:"Línea media",dc:"WC rimless, bacha embutida",p:1400},
+    {id:"c",lbl:"Línea premium",dc:"WC suspendido, vessel, diseño",p:2200}]},
+  {id:"parrillero",cat:"Parrillero / Lavadero",nom:"Parrillero",un:"un",cant:1,sel:"a",ops:[
+    {id:"a",lbl:"Ladrillo refractario",dc:"Tradicional c/ cámara y chimenea",p:1200},
+    {id:"b",lbl:"Módulo acero inox",dc:"Prefabricado inox c/ instalación",p:1800}]},
+];
+
+const cantsState = {};
+RUBROS.forEach(r => cantsState[r.id] = r.cant);
+
+// ─── Helpers ─────────────────────────────────────────────
+const S    = () => uyu ? "$" : "U$S";
+const C    = () => uyu ? TC : 1;
+const f    = v  => Math.round(v * C()).toLocaleString("es-UY");
+const fUYU = v  => Math.round(v).toLocaleString("es-UY");
+const getOp   = r => r.ops.find(o => o.id === r.sel) || r.ops[0];
+const getCant = r => cantsState[r.id] ?? r.cant;
+const getRub  = r => getOp(r).p * getCant(r);
+
+// MO calculations
+const jornadaUYU  = () => MO.jornal + MO.viatico;
+const jCasaTot    = () => MO.jCasa * MO.m2Casa;
+const jDeckTot    = () => MO.jDeck * MO.m2Deck;
+const jTot        = () => jCasaTot() + jDeckTot();
+const nominaUYU   = () => jTot() * jornadaUYU();
+const aucUYU      = () => nominaUYU() * (MO.auc / 100);
+const moUYU       = () => nominaUYU() + aucUYU();
+const moUSD       = () => moUYU() / TC;
+
+// Totals
+const matUSD      = () => RUBROS.reduce((s,r) => s + getRub(r), 0);
+const deckMatUSD  = () => { const r = RUBROS.find(x=>x.id==='deck'); return r ? getRub(r) : 0; };
+const subtotalUSD = () => matUSD() + moUSD();
+const imprev      = () => subtotalUSD() * 0.10;
+const baseEmp     = () => subtotalUSD() + imprev();
+const gananUSD    = () => baseEmp() * (MO.empresa / 100);
+const totalUSD    = () => baseEmp() + gananUSD();
+
+// ─── Interactions ─────────────────────────────────────────
+function toggleMon() { uyu=!uyu; document.getElementById('btn-mon').textContent=uyu?"$ UYU":"U$S"; render(); }
+function setTab(t,btn) { tab=t; document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); render(); }
+function togOpen(id) { openId = openId===id ? null : id; render(); }
+function setSel(rid,sid) { const r=RUBROS.find(x=>x.id===rid); if(r) r.sel=sid; render(); }
+function addCant(rid,d) { cantsState[rid]=Math.max(0,(cantsState[rid]||0)+d); render(); }
+function setCant(rid,v) { cantsState[rid]=parseFloat(v)||0; render(); }
+function setMO(k,v) { MO[k]=isNaN(+v)?v:+v; render(); }
+
+// ─── Render ───────────────────────────────────────────────
+function getCats() {
+  const c={};
+  RUBROS.forEach(r=>{ if(!c[r.cat]) c[r.cat]={items:[],sub:0}; c[r.cat].items.push(r); c[r.cat].sub+=getRub(r); });
+  return c;
+}
+
+function render() {
+  document.getElementById('total-val').textContent = S()+' '+f(totalUSD());
+  const el = document.getElementById('content');
+
+  // ══ TAB MATERIALES ══════════════════════════════════════
+  if (tab==='mat') {
+    const cats = getCats();
+    let h = '<div class="hint">Tocá cada ítem para elegir opción y ajustar cantidad</div>';
+    Object.entries(cats).forEach(([cat,{items,sub}])=>{
+      const col=COL[cat]||"#6B5A3E";
+      h+=`<div class="cat-hdr" style="border-left:3px solid ${col}">
+        <span class="cat-nm" style="color:${col}">${cat}</span>
+        <span class="cat-sb" style="color:${col}">${S()} ${f(sub)}</span>
+      </div><div class="cat-grp">`;
+      items.forEach(r=>{
+        const isOpen=openId===r.id, op=getOp(r), cant=getCant(r), tot=getRub(r);
+        h+=`<div class="rc${isOpen?' open':''}" style="border-color:${isOpen?col:'transparent'}">
+          <div class="rc-row" onclick="togOpen('${r.id}')">
+            <div class="rc-l">
+              <div class="rc-nm">${r.nom}</div>
+              <span class="rc-badge" style="background:${col}22;color:${col}">${op.lbl}</span>
+              <div class="rc-desc">${op.dc}</div>
+            </div>
+            <div class="rc-r">
+              <div class="rc-tot" style="color:${col}">${S()} ${f(tot)}</div>
+              <div class="rc-cant">${cant} ${r.un}</div>
+              <div class="rc-arr" style="color:${isOpen?col:'#C8B8A0'}">${isOpen?'▲':'▼'}</div>
+            </div>
+          </div>`;
+        if(isOpen){
+          h+=`<div class="exp" style="border-top:1px solid ${col}22;background:${col}08">
+            <div class="cant-row">
+              <span style="font-size:11px;font-weight:700;color:${col}">Cantidad:</span>
+              <div class="cant-ctrl" style="border:1.5px solid ${col};border-radius:7px">
+                <button class="cant-btn" style="color:${col}" onclick="event.stopPropagation();addCant('${r.id}',-1)">−</button>
+                <input class="cant-inp" type="number" value="${cant}" onchange="setCant('${r.id}',this.value)" onclick="event.stopPropagation()">
+                <button class="cant-btn" style="color:${col}" onclick="event.stopPropagation();addCant('${r.id}',1)">+</button>
+              </div>
+              <span class="cant-unit">${r.un}</span>
+              <span class="cant-tot" style="color:${col}">${S()} ${f(tot)}</span>
+            </div>
+            <div class="exp-lbl" style="color:${col}">Opciones:</div>`;
+          r.ops.forEach(op2=>{
+            const sel=r.sel===op2.id;
+            h+=`<div class="op" style="background:${sel?col:'#fff'};color:${sel?'#fff':'#1C1409'};border-color:${sel?col:'#E0D8CE'}"
+              onclick="event.stopPropagation();setSel('${r.id}','${op2.id}')">
+              <div class="op-l">
+                <div class="op-nm">${sel?'✓ ':''}${op2.lbl}</div>
+                <div class="op-dc">${op2.dc}</div>
+              </div>
+              <div class="op-r">
+                <div class="op-p">${S()} ${f(op2.p)}</div>
+                <div class="op-u">/${r.un}</div>
+              </div>
+            </div>`;
+          });
+          h+=`</div>`;
+        }
+        h+=`</div>`;
+      });
+      h+=`</div>`;
+    });
+    el.innerHTML=h;
+
+  // ══ TAB MO + BPS ════════════════════════════════════════
+  } else if (tab==='mo') {
+    const nom=nominaUYU(), auc=aucUYU(), moT=moUYU(), jC=jCasaTot(), jD=jDeckTot(), jT=jTot(), jdia=jornadaUYU();
+    el.innerHTML=`
+    <div class="info-box">
+      <strong>Fuentes oficiales:</strong> Laudo Grupo 9 Sub 01 abril 2025 (MTSS) · AUC 75,8% = 71,8% BPS + 4% Caja de Profesionales · Viático zona costera Décima Ronda 2023.
+    </div>
+
+    <div class="card">
+      <div class="card-ttl">⚙️ Parámetros editables</div>
+
+      <div class="mo-f">
+        <span class="mo-lbl">Jornal laudo Cat. V — Abril 2025</span>
+        <span class="mo-sub">Medio Oficial Albañil · Grupo 9 Sub 01 · MTSS</span>
+        <div class="mo-ctrl">
+          <input class="mo-inp" type="number" value="${MO.jornal}" oninput="setMO('jornal',this.value)">
+          <span class="mo-unit">$ UYU/jornal</span>
+        </div>
+      </div>
+
+      <div class="mo-f">
+        <span class="mo-lbl">Viático zona La Pedrera</span>
+        <span class="mo-sub">50% jornal Cat. V · Décima Ronda 2023 Grupo 9</span>
+        <div class="mo-ctrl">
+          <input class="mo-inp" type="number" value="${MO.viatico}" oninput="setMO('viatico',this.value)">
+          <span class="mo-unit">$ UYU/jornal</span>
+        </div>
+      </div>
+
+      <div style="background:#F5EFE6;border-radius:7px;padding:8px 12px;margin-bottom:14px;font-size:11px;color:#6B5A3E">
+        Costo por jornal en zona: <strong>$${fUYU(MO.jornal)} + $${fUYU(MO.viatico)} = $${fUYU(jdia)} UYU</strong>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="mo-f">
+        <span class="mo-lbl">🏠 Casa — ${MO.jCasa} j/m² · ${MO.m2Casa} m²</span>
+        <span class="mo-sub">Construcción tradicional · Rango BPS: 3,5 a 5 j/m²</span>
+        <input class="mo-slider" type="range" min="2" max="6" step="0.5" value="${MO.jCasa}" oninput="setMO('jCasa',this.value)">
+        <div class="sl-labs"><span>2</span><span>3,5–5 (BPS)</span><span>6</span></div>
+        <div class="mini-res" style="background:#EBF1F7;color:#3D5A6B">
+          ${MO.jCasa} j/m² × ${MO.m2Casa} m² = <strong>${Math.round(jC)} jornales</strong> · $${fUYU(jC*jdia)} UYU
+        </div>
+      </div>
+
+      <div class="mo-f">
+        <span class="mo-lbl">🪵 Deck — ${MO.jDeck} j/m² · ${MO.m2Deck} m²</span>
+        <span class="mo-sub">Solo colocación madera sobre estructura · No lleva mamp. ni revoques</span>
+        <input class="mo-slider" type="range" min="0.5" max="2.5" step="0.5" value="${MO.jDeck}" oninput="setMO('jDeck',this.value)">
+        <div class="sl-labs"><span>0,5</span><span>1,0–1,5 (típico)</span><span>2,5</span></div>
+        <div class="mini-res" style="background:#F0E9DF;color:#5A3D20">
+          ${MO.jDeck} j/m² × ${MO.m2Deck} m² = <strong>${Math.round(jD)} jornales</strong> · $${fUYU(jD*jdia)} UYU
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="mo-f">
+        <span class="mo-lbl">AUC — Aporte Unificado Construcción</span>
+        <span class="mo-sub">71,8% BPS + 4% Caja Prof. = 75,8% (dato oficial BPS)</span>
+        <div class="mo-ctrl">
+          <input class="mo-inp" type="number" value="${MO.auc}" step="0.1" oninput="setMO('auc',this.value)">
+          <span class="mo-unit">% s/ nómina</span>
+        </div>
+      </div>
+
+      <div class="mo-f">
+        <span class="mo-lbl">Margen empresa</span>
+        <span class="mo-sub">Se aplica sobre subtotal + imprevistos</span>
+        <div class="mo-ctrl">
+          <input class="mo-inp" type="number" value="${MO.empresa}" oninput="setMO('empresa',this.value)">
+          <span class="mo-unit">%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-ttl">📋 Cálculo paso a paso</div>
+      <div class="rrow">
+        <div><div class="rl">🏠 Jornales casa</div><div class="rs">${MO.jCasa} j/m² × ${MO.m2Casa} m²</div></div>
+        <div class="rv">${Math.round(jC)} jornales</div>
+      </div>
+      <div class="rrow">
+        <div><div class="rl">🪵 Jornales deck</div><div class="rs">${MO.jDeck} j/m² × ${MO.m2Deck} m² · solo colocación</div></div>
+        <div class="rv">${Math.round(jD)} jornales</div>
+      </div>
+      <div class="rrow">
+        <div><div class="rl">Total jornales</div><div class="rs">${Math.round(jC)} + ${Math.round(jD)}</div></div>
+        <div class="rv">${Math.round(jT)} jornales</div>
+      </div>
+      <div class="divider"></div>
+      <div class="rrow">
+        <div><div class="rl">Nómina bruta</div><div class="rs">${Math.round(jT)} jorn. × $${fUYU(jdia)}</div></div>
+        <div class="rv">$ ${fUYU(nom)}</div>
+      </div>
+      <div class="rrow">
+        <div><div class="rl">AUC BPS (${MO.auc}%)</div><div class="rs">Aportes + BSE + SNS + Caja Prof.</div></div>
+        <div class="rv" style="color:#6B3A3A">$ ${fUYU(auc)}</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#1C1409,#3A2010);border-radius:10px;padding:14px;margin-top:10px;color:#F0EBE2">
+        <div style="font-size:9px;letter-spacing:3px;opacity:0.4;text-transform:uppercase;margin-bottom:4px">Total MO + BPS</div>
+        <div style="font-size:28px;font-weight:700;color:#C8A96E">$ ${fUYU(moT)}</div>
+        <div style="font-size:11px;opacity:0.4;margin-top:3px">≈ ${S()} ${f(moUSD())}</div>
+      </div>
+    </div>`;
+
+  // ══ TAB RESUMEN ═════════════════════════════════════════
+  } else {
+    const mat=matUSD(), mo=moUSD(), st=subtotalUSD(), imp=imprev(), base=baseEmp(), gan=gananUSD(), tot=totalUSD();
+    const deckMat=deckMatUSD();
+    const deckOp=getOp(RUBROS.find(r=>r.id==='deck'));
+    const m2C=MO.m2Casa, m2D=MO.m2Deck;
+    const cxm2Casa = tot/m2C;
+    const cxm2Total = tot/(m2C+m2D);
+
+    let h=`<div class="hero">
+      <div class="hero-lbl">Presupuesto al cliente</div>
+      <div class="hero-val">${S()} ${f(tot)}</div>
+      ${uyu?`<div class="hero-sub">≈ U$S ${Math.round(tot).toLocaleString("es-UY")}</div>`:''}
+      <div class="hero-nota">Materiales + MO + BPS + imprevistos 10% + margen empresa ${MO.empresa}%.<br>Precios orientativos mayo 2026 · Laudo Grupo 9 abril 2025.</div>
+    </div>`;
+
+    // ── Desglose distinguido ──
+    h+=`<div class="card">
+      <div class="card-ttl">Desglose distinguido</div>`;
+
+    const items=[
+      {lbl:"Materiales",  sub:"Rubros seleccionados",                          val:mat,  col:"#4A6B4A"},
+      {lbl:"Jornales MO", sub:`${Math.round(jTot())} jornales · $${fUYU(jornadaUYU())} c/u · laudo+viático`, val:nominaUYU()/TC, col:"#3D6480"},
+      {lbl:"BPS — AUC",   sub:`${MO.auc}% s/ nómina · 71,8% BPS + 4% Caja Prof.`, val:aucUYU()/TC,    col:"#6B3A3A"},
+    ];
+    items.forEach(({lbl,sub,val,col})=>{
+      const pct=tot>0?(val/tot*100):0;
+      h+=`<div class="bar-row">
+        <div class="bar-top"><span class="bar-nm">${lbl}</span><span class="bar-vl" style="color:${col}">${S()} ${f(val)}</span></div>
+        <div class="bar-tr"><div class="bar-fl" style="width:${pct.toFixed(1)}%;background:${col}"></div></div>
+        <div class="bar-pt">${pct.toFixed(1)}% del total al cliente</div>
+      </div>`;
+    });
+
+    h+=`<div class="divider"></div>`;
+
+    // Subtotales
+    [
+      {lbl:"Subtotal obra",                  sub:"Materiales + MO + BPS",    val:st,  col:"#1C1409", bold:false},
+      {lbl:"Imprevistos (+10%)",             sub:"",                          val:imp, col:"#7A5A3A", bold:false},
+      {lbl:`Margen empresa (+${MO.empresa}%)`, sub:"Gastos grales. + utilidad", val:gan, col:"#8A4A20", bold:false},
+    ].forEach(({lbl,sub,val,col,bold})=>{
+      h+=`<div class="rrow">
+        <div><div class="rl" style="color:${col};${bold?'font-weight:700':''}">${lbl}</div>${sub?`<div class="rs">${sub}</div>`:''}
+        </div>
+        <div class="rv" style="color:${col}">${S()} ${f(val)}</div>
+      </div>`;
+    });
+
+    h+=`<div style="background:#1C1409;border-radius:8px;padding:11px 14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#F0EBE2;font-size:13px;font-weight:700">TOTAL AL CLIENTE</span>
+      <span style="color:#C8A96E;font-size:19px;font-weight:700">${S()} ${f(tot)}</span>
+    </div></div>`;
+
+    // ── Deck detalle ──
+    h+=`<div class="card">
+      <div class="card-ttl">🪵 Detalle deck exterior</div>
+      <div class="rrow"><div class="rl">Superficie deck</div><div class="rv">${m2D} m²</div></div>
+      <div class="rrow">
+        <div><div class="rl">Material elegido</div><div class="rs">${deckOp.lbl} · ${deckOp.dc}</div></div>
+        <div class="rv">${S()} ${f(deckOp.p)}/m²</div>
+      </div>
+      <div class="rrow"><div class="rl">Costo materiales deck</div><div class="rv">${S()} ${f(deckMat)}</div></div>
+      <div class="rrow">
+        <div><div class="rl">MO colocación deck</div><div class="rs">${MO.jDeck} j/m² × ${m2D} m² × $${fUYU(jornadaUYU())} (AUC incl.)</div></div>
+        <div class="rv">${S()} ${f(jDeckTot()*jornadaUYU()*(1+MO.auc/100)/TC)}</div>
+      </div>
+      <div class="divider"></div>
+      <div class="rrow">
+        <div><div class="rl" style="font-weight:600">Subtotal deck</div><div class="rs">Mat. + MO + AUC (sin empresa ni imprevistos)</div></div>
+        <div class="rv" style="color:#5A3D20;font-size:14px">${S()} ${f(deckMat + jDeckTot()*jornadaUYU()*(1+MO.auc/100)/TC)}</div>
+      </div>
+      <div style="background:#F0E9DF;border-radius:7px;padding:8px 12px;margin-top:8px;font-size:11px;color:#5A3D20;line-height:1.6">
+        ⚠ El deck <strong>no es superficie cubierta</strong>. Se mide y cotiza por separado. Su costo incide en el precio/m² total si se divide por toda la superficie.
+      </div>
+    </div>`;
+
+    // ── Costo por m² ──
+    h+=`<div class="card" style="border:2px solid #C8A96E">
+      <div class="card-ttl" style="color:#8A6820">💡 Precio final por m²</div>
+
+      <div style="background:#1C1409;border-radius:10px;padding:14px;margin-bottom:10px;color:#F0EBE2">
+        <div style="font-size:9px;letter-spacing:3px;opacity:0.4;text-transform:uppercase;margin-bottom:4px">Casa construida · ${m2C} m²</div>
+        <div style="font-size:11px;opacity:0.5;margin-bottom:4px">Total al cliente ÷ ${m2C} m² cubiertos</div>
+        <div class="m2-main" style="color:#C8A96E">${S()} ${f(cxm2Casa)} <span class="m2-unit">/m²</span></div>
+        <div style="font-size:10px;opacity:0.35;margin-top:6px">Referencia mercado vivienda costera UY 2026: U$S 1.200–1.800/m²</div>
+      </div>
+
+      <div style="background:#F5EFE6;border-radius:10px;padding:14px;margin-bottom:8px;">
+        <div style="font-size:9px;letter-spacing:2px;color:#8A7060;text-transform:uppercase;margin-bottom:4px">Casa + Deck · ${m2C+m2D} m² totales</div>
+        <div style="font-size:11px;color:#8A7060;margin-bottom:4px">Total al cliente ÷ ${m2C+m2D} m²</div>
+        <div class="m2-main" style="color:#6B5A3E">${S()} ${f(cxm2Total)} <span class="m2-unit" style="color:#6B5A3E">/m²</span></div>
+        <div style="font-size:10px;color:#9A8A78;margin-top:6px">Este valor es más bajo porque incluye el deck que no es m² construido</div>
+      </div>
+
+      <div style="background:#EBF1F7;border-radius:8px;padding:10px 12px;font-size:11px;color:#3D5A6B;line-height:1.7">
+        <strong>Para comparar con otras obras</strong> usar el precio/m² de casa construida (${m2C} m²). El deck de ${m2D} m² suma costo pero no es superficie cubierta — cotizarlo separado es más transparente para el cliente.
+      </div>
+    </div>`;
+
+    el.innerHTML=h;
+  }
+}
+
+render();
+</script>
+</body>
+</html>
