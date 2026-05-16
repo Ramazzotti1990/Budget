@@ -14,6 +14,7 @@ class Budget(db.Model):
     __tablename__ = "budget"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    studio_id: Mapped[int] = mapped_column(ForeignKey("studio.id"), nullable=False)
     project_id: Mapped[int] = mapped_column(ForeignKey("project.id"), nullable=False)
     current_version_id: Mapped[int | None] = mapped_column(
         ForeignKey("budget_version.id", use_alter=True, name="fk_budget_current_ver"),
@@ -40,6 +41,7 @@ class BudgetVersion(db.Model):
     __tablename__ = "budget_version"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    studio_id: Mapped[int] = mapped_column(ForeignKey("studio.id"), nullable=False)
     budget_id: Mapped[int] = mapped_column(ForeignKey("budget.id"), nullable=False)
     version_no: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="draft", nullable=False)
@@ -69,6 +71,7 @@ class LineItem(db.Model):
     __tablename__ = "line_item"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    studio_id: Mapped[int] = mapped_column(ForeignKey("studio.id"), nullable=False)
     budget_version_id: Mapped[int] = mapped_column(
         ForeignKey("budget_version.id"), nullable=False
     )

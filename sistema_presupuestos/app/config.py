@@ -61,13 +61,10 @@ class TestConfig(BaseConfig):
 class ProdConfig(BaseConfig):
     DEBUG = False
 
-    @property
-    def SECRET_KEY(self) -> str:  # type: ignore[override]
-        return _required("SECRET_KEY")
-
-    @property
-    def SQLALCHEMY_DATABASE_URI(self) -> str:  # type: ignore[override]
-        return _required("DATABASE_URL")
+    def __init__(self) -> None:
+        super().__init__()
+        self.SECRET_KEY = _required("SECRET_KEY")
+        self.SQLALCHEMY_DATABASE_URI = _required("DATABASE_URL")
 
 
 CONFIG_MAP: dict[str, type[BaseConfig]] = {

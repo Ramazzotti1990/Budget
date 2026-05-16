@@ -30,6 +30,11 @@ def create_app(config_name: str | None = None) -> Flask:
 
 def _init_extensions(app: Flask) -> None:
     db.init_app(app)
+    
+    # Import all models to ensure they're registered with db.metadata
+    # before initializing migrations
+    from app import models  # noqa: F401
+    
     migrate.init_app(app, db)
     login_manager.init_app(app)
     mail.init_app(app)

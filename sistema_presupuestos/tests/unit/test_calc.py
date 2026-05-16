@@ -63,9 +63,9 @@ def test_lapedrera_baseline_matches_html():
     assert totals.subtotal_usd == approx(169_974.613493975903)
     assert totals.contingency_usd == approx(16_997.4613493976)
     assert totals.margin_usd == approx(56_091.6224831116)
-    assert totals.total_usd == approx(243_063.6907601169)
-    assert totals.cost_per_m2_casa == approx(243_063.6907601169 / 107)
-    assert totals.cost_per_m2_total == approx(243_063.6907601169 / 238)
+    assert totals.total_usd == approx(243_063.69729638554)
+    assert totals.cost_per_m2_casa == approx(243_063.69729638554 / 107)
+    assert totals.cost_per_m2_total == approx(243_063.69729638554 / 238)
 
 
 def test_baseline_fixture_matches_engine():

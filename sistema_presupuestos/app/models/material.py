@@ -31,6 +31,9 @@ class Material(db.Model):
     """A priced option that can be assigned to a rubro line item."""
 
     __tablename__ = "material"
+    __table_args__ = (
+        UniqueConstraint("rubro_id", "code", name="uq_material_rubro_code"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     rubro_id: Mapped[int] = mapped_column(ForeignKey("rubro.id"), nullable=False)

@@ -14,6 +14,7 @@ class Comment(db.Model):
     __tablename__ = "comment"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    studio_id: Mapped[int] = mapped_column(ForeignKey("studio.id"), nullable=False)
     budget_version_id: Mapped[int] = mapped_column(
         ForeignKey("budget_version.id"), nullable=False
     )
