@@ -6,6 +6,7 @@ from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.extensions import db
+from app.utils import utc_now
 
 
 class Studio(db.Model):
@@ -17,7 +18,7 @@ class Studio(db.Model):
     logo_url: Mapped[str | None] = mapped_column(String(500))
     default_lang: Mapped[str] = mapped_column(String(2), default="es", nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, nullable=False
     )
 
     def __repr__(self) -> str:

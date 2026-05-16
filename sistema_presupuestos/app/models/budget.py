@@ -6,6 +6,7 @@ from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.extensions import db
+from app.utils import utc_now
 
 
 class Budget(db.Model):
@@ -54,7 +55,7 @@ class BudgetVersion(db.Model):
     locked_at: Mapped[datetime | None] = mapped_column(DateTime)
     locked_by_user_id: Mapped[int | None] = mapped_column(ForeignKey("app_user.id"))
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, nullable=False
     )
 
     budget: Mapped[Budget] = relationship(

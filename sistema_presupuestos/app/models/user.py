@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db
+from app.utils import utc_now
 
 
 class User(UserMixin, db.Model):
@@ -23,7 +24,7 @@ class User(UserMixin, db.Model):
     role: Mapped[str] = mapped_column(String(20), nullable=False)
     full_name: Mapped[str | None] = mapped_column(String(120))
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, nullable=False
     )
 
     studio: Mapped[Studio] = relationship()  # type: ignore[name-defined]  # noqa: F821

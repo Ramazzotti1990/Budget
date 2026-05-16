@@ -6,6 +6,7 @@ from sqlalchemy import Date, DateTime, Float, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.extensions import db
+from app.utils import utc_now
 
 
 class FXRate(db.Model):
@@ -21,5 +22,5 @@ class FXRate(db.Model):
     uyu_per_usd: Mapped[float] = mapped_column(Float, nullable=False)
     source: Mapped[str] = mapped_column(String(20), default="bcu", nullable=False)
     fetched_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, nullable=False
     )

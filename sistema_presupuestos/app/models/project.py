@@ -6,6 +6,7 @@ from sqlalchemy import DateTime, Float, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.extensions import db
+from app.utils import utc_now
 
 
 class Project(db.Model):
@@ -20,7 +21,7 @@ class Project(db.Model):
     deck_m2: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="draft", nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, nullable=False
     )
 
     client: Mapped[Client] = relationship()  # type: ignore[name-defined]  # noqa: F821

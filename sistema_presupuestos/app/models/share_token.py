@@ -6,6 +6,7 @@ from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.extensions import db
+from app.utils import utc_now
 
 
 class ShareToken(db.Model):
@@ -22,5 +23,5 @@ class ShareToken(db.Model):
     expires_at: Mapped[datetime | None] = mapped_column(DateTime)
     last_viewed_at: Mapped[datetime | None] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, nullable=False
     )

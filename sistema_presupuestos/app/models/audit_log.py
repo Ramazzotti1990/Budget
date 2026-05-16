@@ -6,6 +6,7 @@ from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.extensions import db
+from app.utils import utc_now
 
 
 class AuditLog(db.Model):
@@ -21,5 +22,5 @@ class AuditLog(db.Model):
     action: Mapped[str] = mapped_column(String(20), nullable=False)
     diff: Mapped[dict | None] = mapped_column(JSON)
     ts: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, nullable=False
     )
