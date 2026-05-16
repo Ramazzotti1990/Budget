@@ -1,0 +1,30 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Tests / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Editors
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Migrations: keep versions; ignore SQLite scratch files
+*.sqlite3
+*.db
+
+# Docker volumes (mounted via bind / named volume — never in-tree)
+pgdata/

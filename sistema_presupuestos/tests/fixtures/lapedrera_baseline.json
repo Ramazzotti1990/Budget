@@ -1,0 +1,37 @@
+{
+  "description": "La Pedrera baseline derived from cotizacion_lapedrera-1.html. Default rubro options + default qty + default labor + 41.5 FX + 10% contingency + 30% margin. Acceptance fixture for MVP parity.",
+  "inputs": {
+    "fx_uyu_per_usd": 41.5,
+    "contingency_pct": 10.0,
+    "margin_pct": 30.0,
+    "labor": {
+      "jornal_uyu": 2953.0,
+      "viatico_uyu": 1477.0,
+      "j_per_m2_casa": 4.0,
+      "j_per_m2_deck": 1.0,
+      "auc_pct": 75.8
+    },
+    "areas": {
+      "casa_m2": 107.0,
+      "deck_m2": 131.0
+    }
+  },
+  "totals": {
+    "materials_usd": 65072.0,
+    "jornales_casa": 428.0,
+    "jornales_deck": 131.0,
+    "jornales_total": 559.0,
+    "nomina_uyu": 2476370.0,
+    "auc_uyu": 1877088.46,
+    "mo_total_uyu": 4353458.46,
+    "mo_total_usd": 104902.6134939759,
+    "subtotal_usd": 169974.6134939759,
+    "contingency_usd": 16997.461349397592,
+    "base_with_contingency_usd": 186972.0748433735,
+    "margin_usd": 56091.622453012045,
+    "total_usd": 243063.69729638554,
+    "total_uyu": 10087143.4378,
+    "cost_per_m2_casa": 2271.6233392185563,
+    "cost_per_m2_total": 1021.2760390604434
+  }
+}
