@@ -5,6 +5,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
+# wkhtmltopdf is not available in python:3.12-slim package sources; omitted intentionally.
+# If PDF generation is needed in future, install from an official .deb release instead.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libpq5 \
         curl \
