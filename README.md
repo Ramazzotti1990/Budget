@@ -5,7 +5,7 @@ Replaces the standalone `cotizacion_lapedrera-1.html` calculator with a
 multi-tenant intranet that persists projects, generates branded PDFs, and
 (in v1.1) shares quotes with clients via magic-link.
 
-The spec lives in `/root/.claude/plans/review-banch-content-precious-parasol.md`.
+See [CLAUDE.md](./CLAUDE.md) for architecture notes and build sequence.
 
 ## Quickstart (local)
 
