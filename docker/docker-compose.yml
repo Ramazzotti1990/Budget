@@ -1,0 +1,45 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      APP_ENV: dev
+      DATABASE_URL: postgresql+psycopg2://budget:budget@db:5432/budget
+      SECRET_KEY: dev-only-change-me
+      MAIL_SERVER: mailhog
+      MAIL_PORT: "1025"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+    volumes:
+      - ../sistema_presupuestos:/app
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: budget
+      POSTGRES_PASSWORD: budget
+      POSTGRES_DB: budget
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U budget"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - "8025:8025"  # web UI
+      - "1025:1025"  # SMTP
+
+volumes:
+  pgdata:
